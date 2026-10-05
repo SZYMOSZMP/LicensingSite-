@@ -224,3 +224,27 @@ test("deleting a plugin deletes its licenses", async () => {
   assert.equal((await api("DELETE", `/api/v1/plugins/${p.id}`)).status, 200);
   assert.equal((await api("GET", `/api/v1/licenses/${lic.key}`)).status, 404);
 });
+
+test("BuiltByBit per-plugin link", async () => {
+  const { body: p } = await api("POST", "/api/v1/plugins", {
+    name: "LinkPlugin",
+    marketplace: { type: "builtbybit", url: "https://builtbybit.com/resources/link-plugin.5150/" },
+  });
+  const send = (pluginId, fields) =>
+    fetch(`${BASE}/api/builtbybit/${pluginId}`, {
+      method: "POST",
+      body: new URLSearchParams({ builtbybit: "true", steam_id: "", version_id: "1", version_number: "1.0", secret: BBB_SECRET, ...fields }),
+    });
+  const ok = await send(p.id, { user_id: "900", resource_id: "5150" });
+  assert.equal(ok.status, 200);
+  const key = await ok.text();
+  const { body: lic } = await api("GET", `/api/v1/licenses/${key}`);
+  assert.equal(lic.pluginId, p.id);
+
+  const wrongResource = await send(p.id, { user_id: "900", resource_id: "4242" });
+  assert.equal(wrongResource.status, 400, "a plugin's link only accepts its own resource");
+  const unknown = await send("zzzzzzzz", { user_id: "900", resource_id: "5150" });
+  assert.equal(unknown.status, 404);
+  const badSecret = await send(p.id, { user_id: "900", resource_id: "5150", secret: "nope" });
+  assert.equal(badSecret.status, 401);
+});

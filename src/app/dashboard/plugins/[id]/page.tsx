@@ -68,6 +68,20 @@ export default async function PluginPage({
 
       <MarketplaceStatus marketplace={plugin.marketplace} />
 
+      {plugin.marketplace === "builtbybit" && (
+        <div className="mb-6 rounded-xl border border-line bg-panel p-4">
+          <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted">BuiltByBit placeholder URL for this plugin</div>
+          <CopyField value={`${publicUrl()}/api/builtbybit/${plugin.id}`} />
+          <p className="mt-2 text-xs text-muted">
+            Paste this as the URL of the <code>%%__BBB_LICENSE__%%</code> External license key placeholder, with the secret from{" "}
+            <Link className="link" href="/dashboard/integrations#builtbybit">
+              Integrations
+            </Link>
+            .
+          </p>
+        </div>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-5">
         <Card title="Add the license check to your plugin" className="lg:col-span-3">
           <PluginSetup pluginId={plugin.id} />

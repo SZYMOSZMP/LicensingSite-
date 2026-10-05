@@ -76,13 +76,23 @@ export default function IntegrationsPage() {
                 <Field label="Type">
                   <input readOnly className="input" value="External license key" />
                 </Field>
-                <Field label="URL">
-                  <CopyField value={`${base}/api/builtbybit`} />
+                <Field label="URL" hint="Each plugin has its own link. Copy it from the plugin's page, or from the list below.">
+                  <input readOnly className="input" value="Your plugin's own link (see below)" />
                 </Field>
                 <Field label="Secret">
                   <CopyField value={bbbSecret ?? "Generate a secret in step 1 first"} />
                 </Field>
               </div>
+              {linked("builtbybit").length > 0 && (
+                <div className="mt-4 space-y-3">
+                  {linked("builtbybit").map((p) => (
+                    <Field key={p.id} label={`URL for ${p.name}`}>
+                      <CopyField value={`${base}/api/builtbybit/${p.id}`} />
+                    </Field>
+                  ))}
+                </div>
+              )}
+              <p className="mt-3 text-xs text-muted">Make one placeholder per plugin. Every plugin uses the same secret.</p>
             </Step>
 
             <Step n={3} title="Link your plugin to the resource">

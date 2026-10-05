@@ -183,7 +183,7 @@ export const GUIDES: Guide[] = [
                 Type: <code>External license key</code>
               </li>
               <li>
-                URL: <code>{baseUrl}/api/builtbybit</code>
+                URL: <code>{baseUrl}/api/builtbybit/</code> followed by the plugin ID, e.g. <code>{baseUrl}/api/builtbybit/abcd1234</code>. Each plugin has its own link, shown on the plugin&apos;s page.
               </li>
               <li>Secret: the secret from step 1</li>
             </ul>
