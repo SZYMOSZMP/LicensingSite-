@@ -24,7 +24,7 @@ npm run build
 npm start          # http://localhost:3000
 ```
 
-Open the site. The first visit asks you to create your owner account. For development with hot reload, use `npm run dev`.
+Open the site and log in at `/login` with your password (the default is `Je!onek23` — set `OWNER_PASSWORD` to change it, or change it later in Dashboard → Settings). The dashboard stays logged in for 30 days, so you don't have to sign in every visit. For development with hot reload, use `npm run dev`.
 
 ### Settings (environment variables)
 
@@ -36,6 +36,11 @@ Copy `.env.example` to `.env` or set these in your host's panel:
 | `PUBLIC_URL` | `http://localhost:PORT` | Your public https address. Can also be set in Dashboard → Settings, which takes priority. |
 | `TRUST_PROXY` | `false` | Set to `true` only behind a reverse proxy (Caddy, Nginx, Cloudflare) so the real server IP is read from `X-Forwarded-For`. |
 | `DATA_DIR` | `./data` | Where the SQLite database and the signing key are stored. |
+| `OWNER_PASSWORD` | `Je!onek23` | The password that protects the dashboard. An owner account is created automatically on first run; log in with this at `/login`. Change it later in Dashboard → Settings. |
+| `OWNER_USERNAME` | `owner` | Username for the auto-created owner account (login only needs the password). |
+| `PAPER_API_JAR` | — | Optional path to your server API jar (e.g. `paper-api`). Giving ProGuard the API makes obfuscation stronger and safer. |
+| `LIBRARY_JARS` | — | Optional extra library jars for ProGuard, separated by `:` (Linux/macOS) or `;` (Windows). |
+| `PROGUARD_AUTODOWNLOAD` | `true` | Whether to download ProGuard automatically on first use. Set `false` to require a manual install. |
 
 **Back up the `data` folder.** It holds every license and the private signing key. If you lose the key, every plugin you've built has to be rebuilt with the new one.
 
@@ -55,6 +60,29 @@ if (!XkixosLicense.validateKey(this, "yourPluginId")) {
 Buyers paste their key into `plugins/YourPlugin/license.txt`. BuiltByBit and Polymart downloads already have the key inside the jar.
 
 The class works on Spigot, Paper and Folia, Java 8 and newer, and needs no extra dependencies.
+
+## Obfuscating plugins
+
+The dashboard can obfuscate your plugin jars with open-source [ProGuard](https://www.guardsquare.com/proguard)
+so other operators can't easily read your code. Two pages:
+
+- **Obfuscate** — upload a built jar, get an obfuscated jar back. Class, method and field names are
+  stripped (and replaced with Java keywords, so the decompiled output won't even compile) and dead
+  code is removed. The main class from `plugin.yml` is preserved so the plugin still loads.
+- **Auto setup** — upload a jar and in one step it's obfuscated, a plugin is registered, and a
+  license key is created and shown to you. The obfuscated jar downloads automatically.
+
+Requirements and notes:
+
+- The server needs **Java (a JDK)** on its PATH — the same machine already runs Java to build plugins.
+- ProGuard (~32 MB) is downloaded into `./vendor` automatically on first use. To install it ahead of
+  time, run `node scripts/install-proguard.mjs`. Set `PROGUARD_AUTODOWNLOAD=false` to require the
+  manual install.
+- For the strongest and safest result, set `PAPER_API_JAR` (or `LIBRARY_JARS`) so ProGuard can see
+  the server API your plugin extends. Without it, ProGuard still produces a working jar.
+- This is **not encryption**: string literals stay readable and a determined reverser still can read
+  the bytecode. It raises the cost of copying your plugin; it doesn't lock the door. Always test an
+  obfuscated jar on a real server before shipping.
 
 ## API overview
 
@@ -90,5 +118,7 @@ src/lib/                   Database, validation, signing, marketplaces, email
 src/app/api/               Public endpoints and REST API
 src/app/dashboard/         Dashboard pages and guides
 library/                   XkixosLicense.java template (downloaded pre-filled from the dashboard)
+obfuscation/               ProGuard dictionary used when obfuscating jars
+scripts/                   Helper scripts (install-proguard.mjs)
 tests/                     End-to-end tests
 ```

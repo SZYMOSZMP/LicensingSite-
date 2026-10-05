@@ -12,13 +12,10 @@ export default async function LoginPage() {
   if (!adminExists()) redirect("/setup");
   if (await isLoggedIn()) redirect("/dashboard");
   return (
-    <AuthShell title="Log in" subtitle="Xkixos Licensing dashboard">
+    <AuthShell title="Log in" subtitle="Enter the password to open the dashboard">
       <ActionForm action={loginAction} className="space-y-4">
-        <Field label="Username">
-          <input name="username" className="input" autoComplete="username" required autoFocus />
-        </Field>
         <Field label="Password">
-          <input name="password" type="password" className="input" autoComplete="current-password" required />
+          <input name="password" type="password" className="input" autoComplete="current-password" required autoFocus />
         </Field>
         <SubmitButton>Log in</SubmitButton>
       </ActionForm>

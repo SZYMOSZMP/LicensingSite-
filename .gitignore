@@ -8,3 +8,6 @@ data/
 library/target/
 next-env.d.ts
 *.tsbuildinfo
+
+# ProGuard binary (downloaded by scripts/install-proguard.mjs)
+vendor/

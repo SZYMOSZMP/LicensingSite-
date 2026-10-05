@@ -30,10 +30,9 @@ export async function loginAction(_prev: ActionState, form: FormData): Promise<A
   if (rateLimited(`login:${ip}`, 10, 15 * 60_000)) return { error: "Too many attempts. Wait 15 minutes and try again." };
   const admin = getAdmin();
   if (!admin) redirect("/setup");
-  const username = String(form.get("username") || "").trim();
   const password = String(form.get("password") || "");
-  const ok = verifyPassword(password, admin.password_hash) && username.toLowerCase() === admin.username.toLowerCase();
-  if (!ok) return { error: "Wrong username or password" };
+  // The site is protected by a single password; the username field is optional.
+  if (!verifyPassword(password, admin.password_hash)) return { error: "Wrong password" };
   await startSession();
   redirect("/dashboard");
 }

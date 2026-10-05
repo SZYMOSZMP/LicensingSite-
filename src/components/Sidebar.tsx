@@ -8,6 +8,8 @@ const NAV = [
   { href: "/dashboard", label: "Overview", icon: "◧" },
   { href: "/dashboard/plugins", label: "Plugins", icon: "⬡" },
   { href: "/dashboard/licenses", label: "Licenses", icon: "⚿" },
+  { href: "/dashboard/obfuscate", label: "Obfuscate", icon: "⧉" },
+  { href: "/dashboard/auto-setup", label: "Auto setup", icon: "⚡" },
   { href: "/dashboard/blacklist", label: "Blacklist", icon: "⊘" },
   { href: "/dashboard/checks", label: "Check log", icon: "≡" },
   { href: "/dashboard/integrations", label: "Integrations", icon: "⇄" },

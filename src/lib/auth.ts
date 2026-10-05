@@ -8,6 +8,10 @@ import { publicUrl } from "./settings";
 const COOKIE = "xkl_session";
 const SESSION_DAYS = 30;
 
+/** The owner account the site is seeded with on first run. Override with env vars. */
+const OWNER_USERNAME = process.env.OWNER_USERNAME || "owner";
+const OWNER_PASSWORD = process.env.OWNER_PASSWORD || "Je!onek23";
+
 export function hashPassword(password: string): string {
   const salt = randomBytes(16).toString("hex");
   const hash = scryptSync(password, salt, 64).toString("hex");
@@ -22,7 +26,18 @@ export function verifyPassword(password: string, stored: string): boolean {
   return actual.length === expected.length && timingSafeEqual(actual, expected);
 }
 
+/**
+ * Makes sure an owner account exists so the site is password-protected out of the box.
+ * On first run it creates one with OWNER_USERNAME / OWNER_PASSWORD (defaults: owner / Je!onek23),
+ * so there's no separate setup step — just log in with the password.
+ */
+export function ensureOwner() {
+  if (db().prepare("SELECT 1 FROM admin WHERE id = 1").get()) return;
+  createAdmin(OWNER_USERNAME, OWNER_PASSWORD);
+}
+
 export function adminExists(): boolean {
+  ensureOwner();
   return !!db().prepare("SELECT 1 FROM admin WHERE id = 1").get();
 }
 
